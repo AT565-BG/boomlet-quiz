@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Mature Is Your Influencer Strategy?</title>
+<style>
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #6b6b6b;
+  --color-text-tertiary: #999;
+  --color-background-primary: #fff;
+  --color-background-secondary: #f7f7f5;
+  --color-background-tertiary: #eee;
+  --color-border-tertiary: rgba(0,0,0,0.15);
+  --color-border-secondary: rgba(0,0,0,0.3);
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text-primary: #f0f0f0;
+    --color-text-secondary: #a0a0a0;
+    --color-text-tertiary: #777;
+    --color-background-primary: #1e1e1e;
+    --color-background-secondary: #2a2a2a;
+    --color-background-tertiary: #333;
+    --color-border-tertiary: rgba(255,255,255,0.15);
+    --color-border-secondary: rgba(255,255,255,0.3);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); color: var(--color-text-primary); background: var(--color-background-primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.quiz-wrap { max-width: 600px; width: 100%; margin: 0 auto; padding: 2rem 1.5rem; }
+.progress-bar { height: 4px; background: var(--color-background-tertiary); border-radius: 2px; margin-bottom: 2rem; overflow: hidden; }
+.progress-fill { height: 100%; background: #534AB7; border-radius: 2px; transition: width 0.4s ease; }
+.q-counter { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase; }
+.q-text { font-size: 18px; font-weight: 500; margin-bottom: 1.5rem; line-height: 1.4; }
+.options { display: flex; flex-direction: column; gap: 10px; }
+.opt-btn { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px 18px; font-size: 15px; line-height: 1.5; text-align: left; cursor: pointer; transition: all 0.15s ease; font-family: var(--font-sans); color: var(--color-text-primary); }
+.opt-btn:hover { border-color: var(--color-border-secondary); background: var(--color-background-secondary); }
+.opt-btn.selected { border-color: #534AB7; background: #EEEDFE; }
+.result-card { text-align: center; padding: 2rem 1rem; }
+.result-badge { display: inline-block; font-size: 12px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; padding: 6px 16px; border-radius: var(--border-radius-md); margin-bottom: 1rem; }
+.result-title { font-size: 22px; font-weight: 500; margin-bottom: 12px; }
+.result-desc { font-size: 15px; color: var(--color-text-secondary); line-height: 1.7; max-width: 480px; margin: 0 auto 1.5rem; }
+.result-meter { margin: 1.5rem auto; max-width: 400px; }
+.meter-track { height: 8px; background: var(--color-background-tertiary); border-radius: 4px; position: relative; overflow: hidden; }
+.meter-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+.meter-labels { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11px; color: var(--color-text-tertiary); }
+.cta-btn { display: inline-block; margin-top: 1.5rem; padding: 12px 28px; font-size: 15px; font-weight: 500; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: transparent; cursor: pointer; font-family: var(--font-sans); color: var(--color-text-primary); transition: all 0.15s ease; text-decoration: none; }
+.cta-btn:hover { background: var(--color-background-secondary); }
+.restart-btn { display: inline-block; margin-top: 12px; padding: 8px 20px; font-size: 13px; border: none; background: transparent; color: var(--color-text-tertiary); cursor: pointer; font-family: var(--font-sans); }
+.restart-btn:hover { color: var(--color-text-secondary); }
+.fade-in { animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="quiz-wrap" id="quiz">
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width: 0%"></div></div>
+  <div id="content"></div>
+</div>
+<script>
+const questions = [
+  {
+    q: "Be honest — where does influencer marketing sit in your budget?",
+    opts: [
+      { text: "It gets whatever's left after the 'real' campaigns.", score: 1 },
+      { text: "It has a line item, but we fight for it every quarter.", score: 2 },
+      { text: "Dedicated budget, planned annually.", score: 3 },
+      { text: "It's one of our top three channels by spend.", score: 4 }
+    ]
+  },
+  {
+    q: "A creator you're working with goes off-brief. What happens?",
+    opts: [
+      { text: "Full-funnel attribution, baby. We know exactly what moved.", score: 4 },
+      { text: "Panic. Legal gets a call.", score: 1 },
+      { text: "We flag it, but honestly their version was probably better.", score: 3 },
+      { text: "We'd notice… eventually.", score: 2 }
+    ]
+  },
+  {
+    q: "How many creators touched your brand in the last 12 months?",
+    opts: [
+      { text: "A handful. We keep it exclusive.", score: 1 },
+      { text: "50+ across multiple campaigns and platforms.", score: 3 },
+      { text: "10–30, depending on the quarter.", score: 2 },
+      { text: "We've lost count — and that's by design.", score: 4 }
+    ]
+  },
+  {
+    q: "Your CEO asks 'what did influencers actually do for us?' You say:",
+    opts: [
+      { text: "We drove X million impressions and Y engagement rate.", score: 2 },
+      { text: "'People liked the content.' (Then change the subject.)", score: 1 },
+      { text: "Here's the full-funnel dashboard — awareness to conversion.", score: 4 },
+      { text: "We can show clicks, traffic, and a few conversion spikes.", score: 3 }
+    ]
+  },
+  {
+    q: "How do you actually pick which creators to work with?",
+    opts: [
+      { text: "Audience overlap data, past performance, brand safety score, content quality.", score: 4 },
+      { text: "Follower count, mostly. Sometimes vibes.", score: 1 },
+      { text: "We look at their content style and whether their audience fits.", score: 3 },
+      { text: "We go for names our team already follows.", score: 2 }
+    ]
+  },
+  {
+    q: "A massive cultural moment drops tomorrow. How fast can you activate creators?",
+    opts: [
+      { text: "We'd need to build a brief, find creators, negotiate… so, weeks.", score: 1 },
+      { text: "We have always-on creators who'd post within hours.", score: 4 },
+      { text: "We could rally our regulars in a few days.", score: 3 },
+      { text: "We'd scramble but probably get something out in a week.", score: 2 }
+    ]
+  },
+  {
+    q: "When a campaign ends, what happens with those creator relationships?",
+    opts: [
+      { text: "They stay in our ecosystem — we nurture them between campaigns.", score: 4 },
+      { text: "We say thanks and move on.", score: 1 },
+      { text: "We re-engage the good ones next time something comes up.", score: 3 },
+      { text: "We keep a list. Some get a second round.", score: 2 }
+    ]
+  }
+];
+
+const results = [
+  {
+    min: 7, max: 12,
+    badge: "Explorer",
+    badgeBg: "#FAECE7", badgeColor: "#993C1D",
+    meterColor: "#F0997B",
+    title: "The curious experimenter",
+    desc: "You know influencer marketing matters — you just haven't built the infrastructure yet. You're running campaigns reactively, picking creators on instinct, and measuring what's easy to measure. The good news? Knowing where you are is the first step. The brands eating your lunch started exactly here.",
+    pct: 20
+  },
+  {
+    min: 13, max: 18,
+    badge: "Builder",
+    badgeBg: "#FAEEDA", badgeColor: "#854F0B",
+    meterColor: "#EF9F27",
+    title: "The campaign-mode operator",
+    desc: "You've moved past experimentation — there's budget, there's process, there's intent. But it's still campaign-shaped: it starts, it runs, it stops. The opportunity is in the gaps between campaigns. That's where creator relationships compound and where most brands leave value on the table.",
+    pct: 45
+  },
+  {
+    min: 19, max: 24,
+    badge: "Strategist",
+    badgeBg: "#E1F5EE", badgeColor: "#0F6E56",
+    meterColor: "#5DCAA5",
+    title: "The systems thinker",
+    desc: "You're not just doing influencer marketing — you're running a strategy. Creator selection is data-informed, measurement goes beyond vanity metrics, and relationships carry over between campaigns. You're ahead of most. The next unlock is turning this from a channel into an ecosystem.",
+    pct: 72
+  },
+  {
+    min: 25, max: 28,
+    badge: "Architect",
+    badgeBg: "#EEEDFE", badgeColor: "#534AB7",
+    meterColor: "#7F77DD",
+    title: "The ecosystem architect",
+    desc: "Influencer isn't a line item for you — it's infrastructure. You've built always-on creator networks, full-funnel attribution, and the operational muscle to activate at speed. You're in the same conversation as the HUL-scale players. The question now isn't whether to scale — it's how to stay ahead.",
+    pct: 95
+  }
+];
+
+let current = 0;
+let scores = [];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function renderQ() {
+  const q = questions[current];
+  const pct = Math.round((current / questions.length) * 100);
+  document.getElementById('progress').style.width = pct + '%';
+  const shuffled = shuffle(q.opts);
+  document.getElementById('content').innerHTML =
+    '<div class="fade-in">' +
+      '<div class="q-counter">Question ' + (current + 1) + ' of ' + questions.length + '</div>' +
+      '<div class="q-text">' + q.q + '</div>' +
+      '<div class="options">' +
+        shuffled.map(function(o, i) {
+          return '<button class="opt-btn" onclick="pick(' + o.score + ', this)">' + o.text + '</button>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+}
+
+function pick(score, btn) {
+  scores.push(score);
+  document.querySelectorAll('.opt-btn').forEach(function(b) { b.style.pointerEvents = 'none'; });
+  btn.classList.add('selected');
+  setTimeout(function() {
+    current++;
+    if (current < questions.length) renderQ();
+    else showResult();
+  }, 350);
+}
+
+function showResult() {
+  var total = scores.reduce(function(a, b) { return a + b; }, 0);
+  document.getElementById('progress').style.width = '100%';
+  var r = results.find(function(r) { return total >= r.min && total <= r.max; }) || results[results.length - 1];
+  document.getElementById('content').innerHTML =
+    '<div class="result-card fade-in">' +
+      '<div class="result-badge" style="background: ' + r.badgeBg + '; color: ' + r.badgeColor + ';">' + r.badge + '</div>' +
+      '<div class="result-title">' + r.title + '</div>' +
+      '<div class="result-desc">' + r.desc + '</div>' +
+      '<div class="result-meter">' +
+        '<div class="meter-track"><div class="meter-fill" id="meter" style="width: 0%; background: ' + r.meterColor + ';"></div></div>' +
+        '<div class="meter-labels"><span>Explorer</span><span>Builder</span><span>Strategist</span><span>Architect</span></div>' +
+      '</div>' +
+      '<a class="cta-btn" href="https://boomletmedia.com" target="_blank">Talk to Boomlet</a>' +
+      '<br><button class="restart-btn" onclick="restart()">Retake quiz</button>' +
+    '</div>';
+  setTimeout(function() { document.getElementById('meter').style.width = r.pct + '%'; }, 100);
+}
+
+function restart() {
+  current = 0;
+  scores = [];
+  renderQ();
+}
+
+renderQ();
+</script>
+</body>
+</html>
